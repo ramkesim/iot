@@ -38,7 +38,7 @@
         }
     </style>
     <!-- Chosen Palette: Cúcuta Neutrals + 6 Thematic Accents aligned with the original Excel dimensions -->
-    <!-- Application Structure Plan: Formulas tab now loops through all 36 items and creates a dedicated card for each, including a new block explaining the mathematical variables. -->
+    <!-- Application Structure Plan: Added a prominent, dimension-colored box for 'Definición de Variables' within each indicator's card in the Formulas tab to ensure the user immediately spots the new information. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 </head>
 <body class="font-sans antialiased overflow-x-hidden h-screen flex flex-col md:flex-row w-full">
@@ -48,7 +48,7 @@
         <div class="p-6 border-b border-stone-100">
             <h1 class="text-xl font-bold text-stone-800 tracking-tight leading-tight flex items-center flex-wrap gap-1">
                 &#x1F3D9;&#xFE0F; Cúcuta Smart City 
-                <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">v4.0</span>
+                <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold border border-emerald-200 shadow-sm">v5.0</span>
             </h1>
             <p class="text-xs text-stone-500 mt-2 font-medium">Panel de Control Oficial</p>
         </div>
@@ -129,7 +129,7 @@
     </main>
 
     <script>
-        // Data Configuration extracted exactly from the provided CSV files, NOW with Variable Explanations
+        // Data Configuration extracted exactly from the provided CSV files, with Variable Explanations
         const initData = [
             // FRONTERA (20%)
             { id: 1, dim: 'Frontera', ind: 'Volumen Comercio Transfronterizo', tipo: 'pos', ref: 500, val: 320, fuente: 'DIAN', form: 'V_com = Σ (Exp + Imp)', vars: '<b>V_com:</b> Volumen de comercio transfronterizo.<br><b>Exp:</b> Valor de exportaciones (USD).<br><b>Imp:</b> Valor de importaciones (USD).', desc: 'Millones de USD por año. Valor total del comercio formal en el paso fronterizo.' },
@@ -150,8 +150,8 @@
             // CAPITAL HUMANO (16%)
             { id: 13, dim: 'Capital Humano', ind: 'Población con Educ. Superior (%)', tipo: 'pos', ref: 80, val: 43, fuente: 'DANE', form: 'E_sup = (P_grad / P_tot) * 100', vars: '<b>E_sup:</b> Educación superior/técnica.<br><b>P_grad:</b> Personas con título post-secundaria.<br><b>P_tot:</b> Población en edad de estudiar/trabajar.', desc: 'Proporción de la población con educación secundaria y superior.' },
             { id: 14, dim: 'Capital Humano', ind: 'Total Escuelas en Cúcuta', tipo: 'pos', ref: 500, val: 483, fuente: 'OpenStreetMap', form: 'Esc = Σ (Públicas + Privadas)', vars: '<b>Esc:</b> Inventario escolar.<br><b>Públicas/Privadas:</b> Instituciones educativas formales georeferenciadas.', desc: 'Cantidad de escuelas públicas y privadas mapeadas en la ciudad.' },
-            { id: 15, dim: 'Capital Humano', ind: 'Gasto Privado en Educación (USD)', tipo: 'pos', ref: 800, val: 148, fuente: 'DANE', form: 'G_edu = Σ G_hogares / Pob', vars: '<b>G_edu:</b> Gasto per cápita en educación.<br><b>G_hogares:</b> Inversión familiar anual.<br><b>Pob:</b> Habitantes.', desc: 'Gasto privado anual en educación per cápita estimado en USD.' },
-            { id: 16, dim: 'Capital Humano', ind: 'Laboratorios TIC en Escuelas', tipo: 'pos', ref: 60, val: 15, fuente: 'Comp. para Educar', form: 'Lab_tic = (Esc_lab / Esc_tot) * 100', vars: '<b>Lab_tic:</b> Laboratorios de tecnología.<br><b>Esc_lab:</b> Colegios con salas de cómputo o robótica funcionales.<br><b>Esc_tot:</b> Total de colegios.', desc: 'Colegios públicos con salas dotadas de computadores o robótica.' },
+            { id: 15, dim: 'Capital Humano', ind: 'Gasto Privado en Educación (USD)', tipo: 'pos', ref: 800, val: 148, fuente: 'DANE', form: 'G_edu = Σ G_hogares / Pob', vars: '<b>G_edu:</b> Gasto per cápita en educación.<br><b>G_hogares:</b> Inversión familiar anual.<br><b>Pob:</b> Habitantes de la ciudad.', desc: 'Gasto privado anual en educación per cápita estimado en USD.' },
+            { id: 16, dim: 'Capital Humano', ind: 'Laboratorios TIC en Escuelas', tipo: 'pos', ref: 60, val: 15, fuente: 'Comp. para Educar', form: 'Lab_tic = (Esc_lab / Esc_tot) * 100', vars: '<b>Lab_tic:</b> Laboratorios de tecnología.<br><b>Esc_lab:</b> Colegios con salas de cómputo o robótica.<br><b>Esc_tot:</b> Total de colegios.', desc: 'Colegios públicos con salas dotadas de computadores o robótica.' },
             { id: 17, dim: 'Capital Humano', ind: 'Conectividad Escolar (%)', tipo: 'pos', ref: 100, val: 90, fuente: 'Comp. para Educar', form: 'C_esc = (Esc_net / Esc_tot) * 100', vars: '<b>C_esc:</b> Conectividad escolar.<br><b>Esc_net:</b> Instituciones con internet de banda ancha dedicado.', desc: 'Instituciones educativas oficiales con conexión a internet activa.' },
             { id: 18, dim: 'Capital Humano', ind: 'Brecha Digital Estudiantil (%)', tipo: 'neg', ref: 5, val: 35, fuente: 'DANE', form: 'B_dig = (Est_0_pc / Est_tot) * 100', vars: '<b>B_dig:</b> Brecha digital.<br><b>Est_0_pc:</b> Estudiantes en hogares que no poseen computador ni tablet.', desc: 'Estudiantes de colegios oficiales sin computador ni tablet en casa.' },
 
@@ -174,9 +174,9 @@
             // MEDIO AMBIENTE (15%)
             { id: 31, dim: 'Medio Ambiente', ind: 'Calidad Agua Potable', tipo: 'pos', ref: 80, val: 55, fuente: 'Numbeo / SSPD', form: 'ICA = x̄(Var_químicas)', vars: '<b>ICA:</b> Índice de Calidad del Agua.<br><b>Var_químicas:</b> Mediciones promedio de pH, Turbidez, Cloro residual.', desc: 'Índice de 0 a 100 sobre la calidad percibida y real del agua.' },
             { id: 32, dim: 'Medio Ambiente', ind: 'Áreas Verdes (m²/hab)', tipo: 'pos', ref: 9, val: 3.2, fuente: 'Plan Desarrollo', form: 'A_verde = Σ (m²_parq) / Pob', vars: '<b>A_verde:</b> Espacio verde per cápita.<br><b>m²_parq:</b> Área total de zonas arborizadas, reservas o parques urbanos.', desc: 'Metros cuadrados de área verde urbana disponible por persona.' },
-            { id: 33, dim: 'Medio Ambiente', ind: 'Índice Calidad del Aire (AQI)', tipo: 'neg', ref: 10, val: 45, fuente: 'IQAir', form: 'AQI = max(I_PM2.5, I_PM10, I_O3)', vars: '<b>AQI:</b> Air Quality Index.<br><b>I_PM:</b> Sub-índices matemáticos correspondientes al mayor contaminante registrado en el día.', desc: 'Promedio anual de AQI. Menor valor indica aire más limpio.' },
+            { id: 33, dim: 'Medio Ambiente', ind: 'Índice Calidad del Aire (AQI)', tipo: 'neg', ref: 10, val: 45, fuente: 'IQAir', form: 'AQI = max(I_PM2.5, I_PM10, I_O3)', vars: '<b>AQI:</b> Air Quality Index.<br><b>I_PM:</b> Sub-índices matemáticos correspondientes al mayor contaminante.', desc: 'Promedio anual de AQI. Menor valor indica aire más limpio.' },
             { id: 34, dim: 'Medio Ambiente', ind: 'Sensores IoT Calidad Aire', tipo: 'pos', ref: 15, val: 3, fuente: 'Jesús Álvarez', form: 'S_iot = Σ Nodos_ESP32', vars: '<b>S_iot:</b> Densidad de sensores ambientales ciudadanos.<br><b>Nodos_ESP32:</b> Microcontroladores midiendo variables en tiempo real.', desc: 'Dispositivos de bajo costo instalados para medir contaminantes.' },
-            { id: 35, dim: 'Medio Ambiente', ind: 'Sistemas Alerta Inundaciones', tipo: 'pos', ref: 5, val: 1, fuente: 'IDEAM', form: 'A_inun = Σ Telemetría_río', vars: '<b>A_inun:</b> Alertas hidrológicas tempranas.<br><b>Telemetría_río:</b> Sensores de nivel del agua en el río Pamplonita y afluentes.', desc: 'Sensores conectados al río Pamplonita con notificación automática.' },
+            { id: 35, dim: 'Medio Ambiente', ind: 'Sistemas Alerta Inundaciones', tipo: 'pos', ref: 5, val: 1, fuente: 'IDEAM', form: 'A_inun = Σ Telemetría_río', vars: '<b>A_inun:</b> Alertas hidrológicas tempranas.<br><b>Telemetría_río:</b> Sensores de nivel del agua en el río Pamplonita.', desc: 'Sensores conectados al río Pamplonita con notificación automática.' },
             { id: 36, dim: 'Medio Ambiente', ind: 'Energía Solar Instalada (MW)', tipo: 'pos', ref: 5, val: 1.2, fuente: 'UPME', form: 'E_sol = Σ (MW_inst)', vars: '<b>E_sol:</b> Capacidad de transición energética.<br><b>MW_inst:</b> Megavatios generados por paneles solares interconectados a la red.', desc: 'Capacidad de generación solar en techos públicos y parques.' }
         ];
 
@@ -361,6 +361,7 @@
                     const badgeClass = item.tipo === 'pos' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-red-100 text-red-800 border-red-200';
                     const tipoText = item.tipo === 'pos' ? 'Positivo ↑' : 'Negativo ↓';
                     
+                    // Added a prominent box specifically for variables to ensure it cannot be missed
                     dynamicFormulasHtml += `
                         <div class="bg-stone-50 p-5 rounded-xl border border-stone-200 flex flex-col justify-between">
                             <div>
@@ -370,10 +371,12 @@
                                 </div>
                                 <code class="block bg-stone-800 text-emerald-400 p-3 rounded-lg font-mono text-sm mb-4 border border-stone-700 tracking-wide">${item.form}</code>
                                 
-                                <div class="bg-white p-4 rounded-lg border border-stone-200 mb-4 shadow-sm">
-                                    <p class="font-bold text-stone-400 uppercase tracking-widest text-[10px] mb-2 flex items-center gap-1">&#x1F4D0; Definición de Variables</p>
-                                    <p class="text-xs text-stone-600 leading-relaxed">${item.vars}</p>
+                                ${item.vars ? `
+                                <div class="${dimStyles.bg} bg-opacity-70 p-4 rounded-lg border ${dimStyles.border} mb-4 shadow-sm">
+                                    <p class="font-bold ${dimStyles.text} uppercase tracking-widest text-[10px] mb-2 flex items-center gap-1">&#x1F50D; Definición de Variables</p>
+                                    <p class="text-xs text-stone-800 leading-relaxed">${item.vars}</p>
                                 </div>
+                                ` : ''}
 
                                 <p class="text-stone-600 text-sm leading-relaxed mb-4">${item.desc}</p>
                             </div>
