@@ -38,7 +38,7 @@
         }
     </style>
     <!-- Chosen Palette: Cúcuta Neutrals + 6 Thematic Accents aligned with the original Excel dimensions -->
-    <!-- Application Structure Plan: Full synchronization with the user's Excel files. 6 exact dimensions. 36 real indicators imported from CSVs. The Formulas tab now iterates over all 36 items and creates a dedicated card for each, eliminating the previous issue of only showing 2 generic formula types. -->
+    <!-- Application Structure Plan: Formulas tab now loops through all 36 items and creates a dedicated card for each, including a new block explaining the mathematical variables. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 </head>
 <body class="font-sans antialiased overflow-x-hidden h-screen flex flex-col md:flex-row w-full">
@@ -48,7 +48,7 @@
         <div class="p-6 border-b border-stone-100">
             <h1 class="text-xl font-bold text-stone-800 tracking-tight leading-tight flex items-center flex-wrap gap-1">
                 &#x1F3D9;&#xFE0F; Cúcuta Smart City 
-                <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">v3.0</span>
+                <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">v4.0</span>
             </h1>
             <p class="text-xs text-stone-500 mt-2 font-medium">Panel de Control Oficial</p>
         </div>
@@ -129,55 +129,55 @@
     </main>
 
     <script>
-        // Data Configuration extracted exactly from the provided CSV files
+        // Data Configuration extracted exactly from the provided CSV files, NOW with Variable Explanations
         const initData = [
             // FRONTERA (20%)
-            { id: 1, dim: 'Frontera', ind: 'Volumen Comercio Transfronterizo', tipo: 'pos', ref: 500, val: 320, fuente: 'DIAN', form: 'V_com = Σ (Exp + Imp) en USD', desc: 'Millones de USD por año. Valor total del comercio formal en el paso fronterizo.' },
-            { id: 2, dim: 'Frontera', ind: 'Flujo Migratorio Formal', tipo: 'pos', ref: 3000000, val: 12775000, fuente: 'Migración Colombia', form: 'F_mig = Σ Cruces_registrados', desc: 'Número de cruces de frontera registrados formalmente por año.' },
-            { id: 3, dim: 'Frontera', ind: 'Tasa Informalidad Migrante', tipo: 'neg', ref: 60, val: 78, fuente: 'DNP', form: 'Inf = (P_informal / P_mig_activa) * 100', desc: 'Porcentaje de migrantes venezolanos en situación de empleo informal en Cúcuta.' },
-            { id: 4, dim: 'Frontera', ind: 'Trazabilidad Biométrica', tipo: 'pos', ref: 10, val: 4, fuente: 'Migración Colombia', form: 'T_bio = (Puntos_bio / Puntos_control) * 10', desc: 'Puntos de control equipados con sistemas biométricos para registro.' },
-            { id: 5, dim: 'Frontera', ind: 'Plataformas Comercio Digital', tipo: 'pos', ref: 5, val: 3, fuente: 'DIAN / MinTIC', form: 'P_dig = Σ Apps_aduaneras', desc: 'Plataformas digitales activas para facilitar intercambio comercial.' },
-            { id: 6, dim: 'Frontera', ind: 'Migrantes con PPT Digital', tipo: 'pos', ref: 100, val: 80, fuente: 'Migración Colombia', form: 'PPT = (M_con_ppt / M_totales) * 100', desc: 'Porcentaje de migrantes venezolanos con Permiso por Protección Temporal activo.' },
+            { id: 1, dim: 'Frontera', ind: 'Volumen Comercio Transfronterizo', tipo: 'pos', ref: 500, val: 320, fuente: 'DIAN', form: 'V_com = Σ (Exp + Imp)', vars: '<b>V_com:</b> Volumen de comercio transfronterizo.<br><b>Exp:</b> Valor de exportaciones (USD).<br><b>Imp:</b> Valor de importaciones (USD).', desc: 'Millones de USD por año. Valor total del comercio formal en el paso fronterizo.' },
+            { id: 2, dim: 'Frontera', ind: 'Flujo Migratorio Formal', tipo: 'pos', ref: 3000000, val: 12775000, fuente: 'Migración Colombia', form: 'F_mig = Σ Cruces_reg', vars: '<b>F_mig:</b> Flujo migratorio formal.<br><b>Cruces_reg:</b> Tránsitos validados por puestos de control migratorio.', desc: 'Número de cruces de frontera registrados formalmente por año.' },
+            { id: 3, dim: 'Frontera', ind: 'Tasa Informalidad Migrante', tipo: 'neg', ref: 60, val: 78, fuente: 'DNP', form: 'Inf = (P_inf / P_mig_act) * 100', vars: '<b>Inf:</b> Tasa de informalidad.<br><b>P_inf:</b> Migrantes trabajando sin contrato.<br><b>P_mig_act:</b> Población migrante económicamente activa.', desc: 'Porcentaje de migrantes venezolanos en situación de empleo informal en Cúcuta.' },
+            { id: 4, dim: 'Frontera', ind: 'Trazabilidad Biométrica', tipo: 'pos', ref: 10, val: 4, fuente: 'Migración Colombia', form: 'T_bio = (P_bio / P_ctrl) * 10', vars: '<b>T_bio:</b> Índice de trazabilidad.<br><b>P_bio:</b> Puestos con biometría activa.<br><b>P_ctrl:</b> Puestos fronterizos totales.', desc: 'Puntos de control equipados con sistemas biométricos para registro.' },
+            { id: 5, dim: 'Frontera', ind: 'Plataformas Comercio Digital', tipo: 'pos', ref: 5, val: 3, fuente: 'DIAN / MinTIC', form: 'P_dig = Σ Apps_Aduanas', vars: '<b>P_dig:</b> Plataformas digitales activas.<br><b>Apps_Aduanas:</b> Sistemas VUCE o aduanas web operativas en frontera.', desc: 'Plataformas digitales activas para facilitar intercambio comercial.' },
+            { id: 6, dim: 'Frontera', ind: 'Migrantes con PPT Digital', tipo: 'pos', ref: 100, val: 80, fuente: 'Migración Colombia', form: 'PPT = (M_ppt / M_tot) * 100', vars: '<b>PPT:</b> Permiso de Protección Temporal.<br><b>M_ppt:</b> Migrantes regularizados.<br><b>M_tot:</b> Total de migrantes censados.', desc: 'Porcentaje de migrantes venezolanos con Permiso por Protección Temporal activo.' },
 
             // ECONOMÍA (17%)
-            { id: 7, dim: 'Economía', ind: 'Empresas Unicornio', tipo: 'pos', ref: 2, val: 0, fuente: 'CB Insights', form: 'U_val = Startups ≥ $10^9 USD', desc: 'Startups con valor de mercado igual o mayor a USD 1.000 millones.' },
-            { id: 8, dim: 'Economía', ind: 'Facilidad abrir empresa (Ranking)', tipo: 'neg', ref: 50, val: 67, fuente: 'World Bank', form: 'R_biz = Posición_Global (1..190)', desc: 'Posición global en facilidad para hacer negocios (menor es mejor).' },
-            { id: 9, dim: 'Economía', ind: 'Índice Global Ecosistemas Startup', tipo: 'neg', ref: 200, val: 640, fuente: 'StartupBlink', form: 'Rank_seb = Puesto_Mundial', desc: 'Posición de Cúcuta en el ranking global de ecosistemas startup.' },
-            { id: 10, dim: 'Economía', ind: 'Startups Tecnológicas Activas', tipo: 'pos', ref: 20, val: 5, fuente: 'iNNpulsa', form: 'S_act = Σ Empresas_TIC_validadas', desc: 'Startups con producto validado y operando en el mercado.' },
-            { id: 11, dim: 'Economía', ind: 'Comercio Electrónico (%)', tipo: 'pos', ref: 40, val: 15, fuente: 'CC Cúcuta', form: 'E_com = (Ventas_web / Ventas_tot) * 100', desc: 'Empresas de Cúcuta que realizan ventas por canales digitales.' },
-            { id: 12, dim: 'Economía', ind: 'Inversión en I+D+TIC (% PIB)', tipo: 'pos', ref: 2, val: 0.5, fuente: 'DNP', form: 'I_D = (Inv_tech / PIB_municipal) * 100', desc: 'Porcentaje del PIB local destinado a innovación y tecnología.' },
+            { id: 7, dim: 'Economía', ind: 'Empresas Unicornio', tipo: 'pos', ref: 2, val: 0, fuente: 'CB Insights', form: 'U_val = Startups ≥ $10^9 USD', vars: '<b>U_val:</b> Empresas Unicornio locales.<br><b>$10^9 USD:</b> Valorización de mercado igual o mayor a 1 billón de dólares.', desc: 'Startups con valor de mercado igual o mayor a USD 1.000 millones.' },
+            { id: 8, dim: 'Economía', ind: 'Facilidad abrir empresa (Ranking)', tipo: 'neg', ref: 50, val: 67, fuente: 'World Bank', form: 'R_biz = Posición_Global', vars: '<b>R_biz:</b> Ranking Doing Business o equivalente.<br><b>Posición_Global:</b> Puesto exacto en el escalafón mundial (1 al 190).', desc: 'Posición global en facilidad para hacer negocios (menor es mejor).' },
+            { id: 9, dim: 'Economía', ind: 'Índice Global Ecosistemas Startup', tipo: 'neg', ref: 200, val: 640, fuente: 'StartupBlink', form: 'Rank_eco = Puesto_Mundial', vars: '<b>Rank_eco:</b> Startup Ecosystem Benchmark.<br><b>Puesto_Mundial:</b> Ranking de la ciudad a nivel global de ecosistemas tecnológicos.', desc: 'Posición de Cúcuta en el ranking global de ecosistemas startup.' },
+            { id: 10, dim: 'Economía', ind: 'Startups Tecnológicas Activas', tipo: 'pos', ref: 20, val: 5, fuente: 'iNNpulsa', form: 'S_act = Σ Emp_TIC_validas', vars: '<b>S_act:</b> Startups activas.<br><b>Emp_TIC_validas:</b> Empresas de base tecnológica facturando u operando.', desc: 'Startups con producto validado y operando en el mercado.' },
+            { id: 11, dim: 'Economía', ind: 'Comercio Electrónico (%)', tipo: 'pos', ref: 40, val: 15, fuente: 'CC Cúcuta', form: 'E_com = (V_web / V_tot) * 100', vars: '<b>E_com:</b> Adopción de E-commerce.<br><b>V_web:</b> Empresas que usan canales digitales.<br><b>V_tot:</b> Empresas registradas en Cámara de Comercio.', desc: 'Empresas de Cúcuta que realizan ventas por canales digitales.' },
+            { id: 12, dim: 'Economía', ind: 'Inversión en I+D+TIC (% PIB)', tipo: 'pos', ref: 2, val: 0.5, fuente: 'DNP', form: 'I_D = (Inv_tech / PIB) * 100', vars: '<b>I_D:</b> Inversión en I+D+i.<br><b>Inv_tech:</b> Capital destinado a innovación.<br><b>PIB:</b> Producto Interno Bruto del municipio.', desc: 'Porcentaje del PIB local destinado a innovación y tecnología.' },
 
             // CAPITAL HUMANO (16%)
-            { id: 13, dim: 'Capital Humano', ind: 'Población con Educ. Superior (%)', tipo: 'pos', ref: 80, val: 43, fuente: 'DANE', form: 'E_sup = (P_graduados / P_total) * 100', desc: 'Proporción de la población con educación secundaria y superior.' },
-            { id: 14, dim: 'Capital Humano', ind: 'Total Escuelas en Cúcuta', tipo: 'pos', ref: 500, val: 483, fuente: 'OpenStreetMap', form: 'Esc = Σ (Públicas + Privadas)', desc: 'Cantidad de escuelas públicas y privadas mapeadas en la ciudad.' },
-            { id: 15, dim: 'Capital Humano', ind: 'Gasto Privado en Educación (USD)', tipo: 'pos', ref: 800, val: 148, fuente: 'DANE', form: 'G_edu = Σ Gasto_hogares / Población', desc: 'Gasto privado anual en educación per cápita estimado en USD.' },
-            { id: 16, dim: 'Capital Humano', ind: 'Laboratorios TIC en Escuelas', tipo: 'pos', ref: 60, val: 15, fuente: 'Comp. para Educar', form: 'Lab_tic = (Esc_con_lab / Esc_tot) * 100', desc: 'Colegios públicos con salas dotadas de computadores o robótica.' },
-            { id: 17, dim: 'Capital Humano', ind: 'Conectividad Escolar (%)', tipo: 'pos', ref: 100, val: 90, fuente: 'Comp. para Educar', form: 'C_esc = (Esc_internet / Esc_tot) * 100', desc: 'Instituciones educativas oficiales con conexión a internet activa.' },
-            { id: 18, dim: 'Capital Humano', ind: 'Brecha Digital Estudiantil (%)', tipo: 'neg', ref: 5, val: 35, fuente: 'DANE', form: 'B_dig = (Est_sin_pc / Est_tot) * 100', desc: 'Estudiantes de colegios oficiales sin computador ni tablet en casa.' },
+            { id: 13, dim: 'Capital Humano', ind: 'Población con Educ. Superior (%)', tipo: 'pos', ref: 80, val: 43, fuente: 'DANE', form: 'E_sup = (P_grad / P_tot) * 100', vars: '<b>E_sup:</b> Educación superior/técnica.<br><b>P_grad:</b> Personas con título post-secundaria.<br><b>P_tot:</b> Población en edad de estudiar/trabajar.', desc: 'Proporción de la población con educación secundaria y superior.' },
+            { id: 14, dim: 'Capital Humano', ind: 'Total Escuelas en Cúcuta', tipo: 'pos', ref: 500, val: 483, fuente: 'OpenStreetMap', form: 'Esc = Σ (Públicas + Privadas)', vars: '<b>Esc:</b> Inventario escolar.<br><b>Públicas/Privadas:</b> Instituciones educativas formales georeferenciadas.', desc: 'Cantidad de escuelas públicas y privadas mapeadas en la ciudad.' },
+            { id: 15, dim: 'Capital Humano', ind: 'Gasto Privado en Educación (USD)', tipo: 'pos', ref: 800, val: 148, fuente: 'DANE', form: 'G_edu = Σ G_hogares / Pob', vars: '<b>G_edu:</b> Gasto per cápita en educación.<br><b>G_hogares:</b> Inversión familiar anual.<br><b>Pob:</b> Habitantes.', desc: 'Gasto privado anual en educación per cápita estimado en USD.' },
+            { id: 16, dim: 'Capital Humano', ind: 'Laboratorios TIC en Escuelas', tipo: 'pos', ref: 60, val: 15, fuente: 'Comp. para Educar', form: 'Lab_tic = (Esc_lab / Esc_tot) * 100', vars: '<b>Lab_tic:</b> Laboratorios de tecnología.<br><b>Esc_lab:</b> Colegios con salas de cómputo o robótica funcionales.<br><b>Esc_tot:</b> Total de colegios.', desc: 'Colegios públicos con salas dotadas de computadores o robótica.' },
+            { id: 17, dim: 'Capital Humano', ind: 'Conectividad Escolar (%)', tipo: 'pos', ref: 100, val: 90, fuente: 'Comp. para Educar', form: 'C_esc = (Esc_net / Esc_tot) * 100', vars: '<b>C_esc:</b> Conectividad escolar.<br><b>Esc_net:</b> Instituciones con internet de banda ancha dedicado.', desc: 'Instituciones educativas oficiales con conexión a internet activa.' },
+            { id: 18, dim: 'Capital Humano', ind: 'Brecha Digital Estudiantil (%)', tipo: 'neg', ref: 5, val: 35, fuente: 'DANE', form: 'B_dig = (Est_0_pc / Est_tot) * 100', vars: '<b>B_dig:</b> Brecha digital.<br><b>Est_0_pc:</b> Estudiantes en hogares que no poseen computador ni tablet.', desc: 'Estudiantes de colegios oficiales sin computador ni tablet en casa.' },
 
             // COHESIÓN SOCIAL (16%)
-            { id: 19, dim: 'Cohesión Social', ind: 'Ciudad Amigable con Mujeres', tipo: 'pos', ref: 4.5, val: 2.5, fuente: 'Nomad List', form: 'C_amig = x̄(Índices_seguridad)', desc: 'Score de 1 a 5 de entorno amigable y seguro para mujeres.' },
-            { id: 20, dim: 'Cohesión Social', ind: 'Total Hospitales y Clínicas', tipo: 'pos', ref: 50, val: 18, fuente: 'OpenStreetMap', form: 'Hosp = Σ Centros_salud_activos', desc: 'Infraestructura de salud incluyendo centros de salud locales.' },
-            { id: 21, dim: 'Cohesión Social', ind: 'Tasa de Criminalidad', tipo: 'neg', ref: 30, val: 68, fuente: 'Numbeo', form: 'Crimen = (Delitos_reportados / 100k_hab)', desc: 'Nivel general de crimen percibido (escala de 0 a 100).' },
-            { id: 22, dim: 'Cohesión Social', ind: 'Hospitales con Telemedicina', tipo: 'pos', ref: 10, val: 3, fuente: 'MinSalud', form: 'H_tele = (Hosp_digital / Hosp_tot) * 100', desc: 'Establecimientos que ofrecen consulta médica remota.' },
-            { id: 23, dim: 'Cohesión Social', ind: 'Cobertura 4G/5G (%)', tipo: 'pos', ref: 100, val: 95, fuente: 'MinTIC', form: 'Cob_4G = (Area_4G / Area_urbana) * 100', desc: 'Zona urbana de Cúcuta con señal de telefonía móvil de alta velocidad.' },
-            { id: 24, dim: 'Cohesión Social', ind: 'Apps Ciudadanas Activas', tipo: 'pos', ref: 5, val: 2, fuente: 'Alcaldía Cúcuta', form: 'Apps_gov = Σ Aplicaciones_oficiales', desc: 'Aplicaciones móviles oficiales con servicios activos para ciudadanos.' },
+            { id: 19, dim: 'Cohesión Social', ind: 'Ciudad Amigable con Mujeres', tipo: 'pos', ref: 4.5, val: 2.5, fuente: 'Nomad List', form: 'C_amig = x̄(Índices_seguridad)', vars: '<b>C_amig:</b> Puntuación de ciudad amigable/segura.<br><b>x̄:</b> Media aritmética de encuestas cualitativas internacionales.', desc: 'Score de 1 a 5 de entorno amigable y seguro para mujeres.' },
+            { id: 20, dim: 'Cohesión Social', ind: 'Total Hospitales y Clínicas', tipo: 'pos', ref: 50, val: 18, fuente: 'OpenStreetMap', form: 'Hosp = Σ Centros_salud', vars: '<b>Hosp:</b> Infraestructura de salud en la ciudad.<br><b>Centros_salud:</b> Clínicas y hospitales prestando servicio continuo.', desc: 'Infraestructura de salud incluyendo centros de salud locales.' },
+            { id: 21, dim: 'Cohesión Social', ind: 'Tasa de Criminalidad', tipo: 'neg', ref: 30, val: 68, fuente: 'Numbeo', form: 'Crimen = (Delitos / 100k_hab)', vars: '<b>Crimen:</b> Tasa delictiva/Percepción.<br><b>Delitos:</b> Denuncias formales ponderadas.<br><b>100k_hab:</b> Ratio poblacional estándar.', desc: 'Nivel general de crimen percibido (escala de 0 a 100).' },
+            { id: 22, dim: 'Cohesión Social', ind: 'Hospitales con Telemedicina', tipo: 'pos', ref: 10, val: 3, fuente: 'MinSalud', form: 'H_tele = (H_dig / Hosp) * 100', vars: '<b>H_tele:</b> Telemedicina habilitada.<br><b>H_dig:</b> Centros equipados para consultas remotas o diagnóstico virtual.', desc: 'Establecimientos que ofrecen consulta médica remota.' },
+            { id: 23, dim: 'Cohesión Social', ind: 'Cobertura 4G/5G (%)', tipo: 'pos', ref: 100, val: 95, fuente: 'MinTIC', form: 'Cob_4G = (A_4G / A_urb) * 100', vars: '<b>Cob_4G:</b> Cobertura de red celular.<br><b>A_4G:</b> Kilómetros cuadrados con señal móvil estable.<br><b>A_urb:</b> Perímetro urbano.', desc: 'Zona urbana de Cúcuta con señal de telefonía móvil de alta velocidad.' },
+            { id: 24, dim: 'Cohesión Social', ind: 'Apps Ciudadanas Activas', tipo: 'pos', ref: 5, val: 2, fuente: 'Alcaldía Cúcuta', form: 'Apps_gov = Σ Apps_Oficiales', vars: '<b>Apps_gov:</b> Participación ciudadana móvil.<br><b>Apps_Oficiales:</b> Aplicaciones de la Alcaldía en las tiendas de apps.', desc: 'Aplicaciones móviles oficiales con servicios activos para ciudadanos.' },
 
             // GOBERNANZA (16%)
-            { id: 25, dim: 'Gobernanza', ind: 'Bitcoin Legal (0 o 1)', tipo: 'pos', ref: 1, val: 0.5, fuente: 'Banco República', form: 'Crypto_leg = {0=Ilegal, 0.5=Gris, 1=Legal}', desc: 'Situación legal de criptoactivos (0.5 = Zona Gris / Tolerado).' },
-            { id: 26, dim: 'Gobernanza', ind: 'Certificación ISO 37120', tipo: 'pos', ref: 4, val: 0, fuente: 'WCCD', form: 'ISO_37120 = Nivel_alcanzado (0..6)', desc: 'Nivel de certificación global para servicios urbanos y calidad de vida.' },
-            { id: 27, dim: 'Gobernanza', ind: 'Trámites Digitales (%)', tipo: 'pos', ref: 70, val: 30, fuente: 'Alcaldía Cúcuta', form: 'T_dig = (Trámites_web / Trámites_tot) * 100', desc: 'Servicios de la alcaldía que se pueden completar 100% online.' },
-            { id: 28, dim: 'Gobernanza', ind: 'Datos Abiertos Alcaldía', tipo: 'pos', ref: 30, val: 12, fuente: 'Datos.gov.co', form: 'D_open = Σ Datasets_publicados', desc: 'Conjuntos de datos (datasets) publicados oficialmente.' },
-            { id: 29, dim: 'Gobernanza', ind: 'Cámaras Videovigilancia', tipo: 'pos', ref: 300, val: 150, fuente: 'Policía Cúcuta', form: 'Cam_seg = Σ Cámaras_conectadas_C4', desc: 'Cámaras de seguridad operativas conectadas al centro de monitoreo.' },
-            { id: 30, dim: 'Gobernanza', ind: 'Semáforos Inteligentes', tipo: 'pos', ref: 20, val: 5, fuente: 'Sec. Movilidad', form: 'S_intel = (S_actuados / S_totales) * 100', desc: 'Semáforos con control adaptativo al flujo vehicular en tiempo real.' },
+            { id: 25, dim: 'Gobernanza', ind: 'Bitcoin Legal (0 o 1)', tipo: 'pos', ref: 1, val: 0.5, fuente: 'Banco República', form: 'Crypto = {0, 0.5, 1}', vars: '<b>Crypto:</b> Variable categórica de marco legal de criptomonedas.<br><b>0:</b> Ilegal. <b>0.5:</b> Tolerado/Gris. <b>1:</b> Marco regulatorio claro.', desc: 'Situación legal de criptoactivos (0.5 = Zona Gris / Tolerado).' },
+            { id: 26, dim: 'Gobernanza', ind: 'Certificación ISO 37120', tipo: 'pos', ref: 4, val: 0, fuente: 'WCCD', form: 'ISO_37120 = Nivel (0..6)', vars: '<b>ISO_37120:</b> Estándar global de Smart Cities y calidad de vida.<br><b>Nivel:</b> Grado de certificación institucional obtenida.', desc: 'Nivel de certificación global para servicios urbanos y calidad de vida.' },
+            { id: 27, dim: 'Gobernanza', ind: 'Trámites Digitales (%)', tipo: 'pos', ref: 70, val: 30, fuente: 'Alcaldía Cúcuta', form: 'T_dig = (T_web / T_tot) * 100', vars: '<b>T_dig:</b> Digitalización de burocracia.<br><b>T_web:</b> Trámites realizables sin asistencia presencial.', desc: 'Servicios de la alcaldía que se pueden completar 100% online.' },
+            { id: 28, dim: 'Gobernanza', ind: 'Datos Abiertos Alcaldía', tipo: 'pos', ref: 30, val: 12, fuente: 'Datos.gov.co', form: 'D_open = Σ Datasets_pub', vars: '<b>D_open:</b> Transparencia gubernamental.<br><b>Datasets_pub:</b> Archivos en formatos abiertos (CSV, JSON) en portal oficial.', desc: 'Conjuntos de datos (datasets) publicados oficialmente.' },
+            { id: 29, dim: 'Gobernanza', ind: 'Cámaras Videovigilancia', tipo: 'pos', ref: 300, val: 150, fuente: 'Policía Cúcuta', form: 'Cam_seg = Σ Cámaras_C4', vars: '<b>Cam_seg:</b> Videovigilancia urbana.<br><b>Cámaras_C4:</b> Cámaras tipo PTZ o LPR conectadas al centro de comando.', desc: 'Cámaras de seguridad operativas conectadas al centro de monitoreo.' },
+            { id: 30, dim: 'Gobernanza', ind: 'Semáforos Inteligentes', tipo: 'pos', ref: 20, val: 5, fuente: 'Sec. Movilidad', form: 'S_intel = (S_act / S_tot) * 100', vars: '<b>S_intel:</b> Semaforización adaptativa.<br><b>S_act:</b> Intersecciones con sensores de flujo de tráfico en tiempo real.', desc: 'Semáforos con control adaptativo al flujo vehicular en tiempo real.' },
 
             // MEDIO AMBIENTE (15%)
-            { id: 31, dim: 'Medio Ambiente', ind: 'Calidad Agua Potable', tipo: 'pos', ref: 80, val: 55, fuente: 'Numbeo / SSPD', form: 'ICA = x̄(Variables_fisicoquímicas)', desc: 'Índice de 0 a 100 sobre la calidad percibida y real del agua.' },
-            { id: 32, dim: 'Medio Ambiente', ind: 'Áreas Verdes (m²/hab)', tipo: 'pos', ref: 9, val: 3.2, fuente: 'Plan Desarrollo', form: 'A_verde = Σ (m²_parques) / Población', desc: 'Metros cuadrados de área verde urbana disponible por persona.' },
-            { id: 33, dim: 'Medio Ambiente', ind: 'Índice Calidad del Aire (AQI)', tipo: 'neg', ref: 10, val: 45, fuente: 'IQAir', form: 'AQI = max(I_PM2.5, I_PM10, I_O3)', desc: 'Promedio anual de AQI. Menor valor indica aire más limpio.' },
-            { id: 34, dim: 'Medio Ambiente', ind: 'Sensores IoT Calidad Aire', tipo: 'pos', ref: 15, val: 3, fuente: 'Jesús Álvarez', form: 'S_iot = Σ Nodos_activos_ESP32', desc: 'Dispositivos de bajo costo instalados para medir contaminantes.' },
-            { id: 35, dim: 'Medio Ambiente', ind: 'Sistemas Alerta Inundaciones', tipo: 'pos', ref: 5, val: 1, fuente: 'IDEAM', form: 'A_inun = Σ Sensores_telemetría_río', desc: 'Sensores conectados al río Pamplonita con notificación automática.' },
-            { id: 36, dim: 'Medio Ambiente', ind: 'Energía Solar Instalada (MW)', tipo: 'pos', ref: 5, val: 1.2, fuente: 'UPME', form: 'E_sol = Σ (MW_instalados)', desc: 'Capacidad de generación solar en techos públicos y parques.' }
+            { id: 31, dim: 'Medio Ambiente', ind: 'Calidad Agua Potable', tipo: 'pos', ref: 80, val: 55, fuente: 'Numbeo / SSPD', form: 'ICA = x̄(Var_químicas)', vars: '<b>ICA:</b> Índice de Calidad del Agua.<br><b>Var_químicas:</b> Mediciones promedio de pH, Turbidez, Cloro residual.', desc: 'Índice de 0 a 100 sobre la calidad percibida y real del agua.' },
+            { id: 32, dim: 'Medio Ambiente', ind: 'Áreas Verdes (m²/hab)', tipo: 'pos', ref: 9, val: 3.2, fuente: 'Plan Desarrollo', form: 'A_verde = Σ (m²_parq) / Pob', vars: '<b>A_verde:</b> Espacio verde per cápita.<br><b>m²_parq:</b> Área total de zonas arborizadas, reservas o parques urbanos.', desc: 'Metros cuadrados de área verde urbana disponible por persona.' },
+            { id: 33, dim: 'Medio Ambiente', ind: 'Índice Calidad del Aire (AQI)', tipo: 'neg', ref: 10, val: 45, fuente: 'IQAir', form: 'AQI = max(I_PM2.5, I_PM10, I_O3)', vars: '<b>AQI:</b> Air Quality Index.<br><b>I_PM:</b> Sub-índices matemáticos correspondientes al mayor contaminante registrado en el día.', desc: 'Promedio anual de AQI. Menor valor indica aire más limpio.' },
+            { id: 34, dim: 'Medio Ambiente', ind: 'Sensores IoT Calidad Aire', tipo: 'pos', ref: 15, val: 3, fuente: 'Jesús Álvarez', form: 'S_iot = Σ Nodos_ESP32', vars: '<b>S_iot:</b> Densidad de sensores ambientales ciudadanos.<br><b>Nodos_ESP32:</b> Microcontroladores midiendo variables en tiempo real.', desc: 'Dispositivos de bajo costo instalados para medir contaminantes.' },
+            { id: 35, dim: 'Medio Ambiente', ind: 'Sistemas Alerta Inundaciones', tipo: 'pos', ref: 5, val: 1, fuente: 'IDEAM', form: 'A_inun = Σ Telemetría_río', vars: '<b>A_inun:</b> Alertas hidrológicas tempranas.<br><b>Telemetría_río:</b> Sensores de nivel del agua en el río Pamplonita y afluentes.', desc: 'Sensores conectados al río Pamplonita con notificación automática.' },
+            { id: 36, dim: 'Medio Ambiente', ind: 'Energía Solar Instalada (MW)', tipo: 'pos', ref: 5, val: 1.2, fuente: 'UPME', form: 'E_sol = Σ (MW_inst)', vars: '<b>E_sol:</b> Capacidad de transición energética.<br><b>MW_inst:</b> Megavatios generados por paneles solares interconectados a la red.', desc: 'Capacidad de generación solar en techos públicos y parques.' }
         ];
 
         // Specific Weights matching exactly the Excel "Resumen Puntajes.csv"
@@ -203,7 +203,7 @@
 
         const descriptions = {
             'Resumen': 'Consolidado general del Índice con cálculos en tiempo real idénticos al Excel.',
-            'Formulas': 'Catálogo exhaustivo mostrando las 36 fórmulas individualizadas por cada indicador.',
+            'Formulas': 'Catálogo exhaustivo mostrando las fórmulas individualizadas y la explicación de sus variables.',
             'Frontera': 'Métricas críticas de comercio binacional, flujo migratorio e integración (Peso: 20%).',
             'Economía': 'Competitividad, startups y digitalización del ecosistema local (Peso: 17%).',
             'Capital Humano': 'Educación, brecha digital e inversión en talento (Peso: 16%).',
@@ -345,7 +345,6 @@
             let dynamicFormulasHtml = '';
             const dims = Object.keys(dimWeights);
 
-            // Generate exactly ONE card for EVERY indicator
             dims.forEach(dim => {
                 const items = state.data.filter(d => d.dim === dim);
                 if (items.length === 0) return;
@@ -355,7 +354,7 @@
                 dynamicFormulasHtml += `
                     <div class="bg-white p-6 rounded-xl border ${dimStyles.border} shadow-sm mb-6">
                         <h4 class="font-black text-2xl ${dimStyles.text} mb-4 border-b ${dimStyles.border} pb-3">${dim}</h4>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 `;
 
                 items.forEach(item => {
@@ -363,16 +362,22 @@
                     const tipoText = item.tipo === 'pos' ? 'Positivo ↑' : 'Negativo ↓';
                     
                     dynamicFormulasHtml += `
-                        <div class="bg-stone-50 p-4 rounded-lg border border-stone-200 flex flex-col justify-between">
+                        <div class="bg-stone-50 p-5 rounded-xl border border-stone-200 flex flex-col justify-between">
                             <div>
-                                <div class="flex justify-between items-start mb-2">
-                                    <strong class="text-stone-800 text-md pr-2 leading-tight">${item.ind}</strong>
+                                <div class="flex justify-between items-start mb-3">
+                                    <strong class="text-stone-800 text-lg pr-2 leading-tight">${item.ind}</strong>
                                     <span class="text-[10px] px-2 py-0.5 rounded font-bold border whitespace-nowrap ${badgeClass}">${tipoText}</span>
                                 </div>
-                                <code class="block bg-stone-800 text-emerald-400 p-2.5 rounded font-mono text-sm mb-3 border border-stone-700 tracking-wide">${item.form}</code>
-                                <p class="text-stone-600 text-sm leading-relaxed mb-3">${item.desc}</p>
+                                <code class="block bg-stone-800 text-emerald-400 p-3 rounded-lg font-mono text-sm mb-4 border border-stone-700 tracking-wide">${item.form}</code>
+                                
+                                <div class="bg-white p-4 rounded-lg border border-stone-200 mb-4 shadow-sm">
+                                    <p class="font-bold text-stone-400 uppercase tracking-widest text-[10px] mb-2 flex items-center gap-1">&#x1F4D0; Definición de Variables</p>
+                                    <p class="text-xs text-stone-600 leading-relaxed">${item.vars}</p>
+                                </div>
+
+                                <p class="text-stone-600 text-sm leading-relaxed mb-4">${item.desc}</p>
                             </div>
-                            <p class="text-stone-500 text-xs border-t border-stone-200 pt-2"><strong>Fuente:</strong> ${item.fuente}</p>
+                            <p class="text-stone-500 text-xs border-t border-stone-200 pt-3"><strong>Fuente Validada:</strong> ${item.fuente}</p>
                         </div>
                     `;
                 });
@@ -386,9 +391,9 @@
             container.innerHTML = `
                 <div class="p-8 text-stone-700 bg-white">
                     <div class="mb-10 text-center max-w-3xl mx-auto">
-                        <h2 class="text-3xl font-black text-stone-800 mb-4">&#x1F4D0; Catálogo Individual de Fórmulas</h2>
+                        <h2 class="text-3xl font-black text-stone-800 mb-4">&#x1F4D0; Catálogo Analítico de Fórmulas</h2>
                         <p class="text-stone-600 text-lg leading-relaxed">
-                            Aquí se detalla la formulación matemática física, la fuente bibliográfica y la polaridad para <strong>cada uno de los ${state.data.length} indicadores</strong>. Posteriormente, la herramienta normaliza estos resultados a una escala base de 0 a 10 usando la lógica Positiva <code>(Val/Ref*10)</code> o Negativa <code>(Ref/Val*10)</code>.
+                            Aquí se detalla la formulación matemática física, la <strong>definición exacta de las variables</strong> y la fuente para cada uno de los ${state.data.length} indicadores. Posteriormente, la herramienta normaliza los resultados a una escala base de 0 a 10.
                         </p>
                     </div>
 
@@ -531,7 +536,7 @@
                 }
             });
 
-            document.getElementById('view-title').textContent = state.currentTab === 'Resumen' ? 'Resumen de Puntajes' : (state.currentTab === 'Formulas' ? 'Diccionario de Fórmulas' : `Indicadores: ${state.currentTab}`);
+            document.getElementById('view-title').textContent = state.currentTab === 'Resumen' ? 'Resumen de Puntajes' : (state.currentTab === 'Formulas' ? 'Diccionario Analítico de Fórmulas' : `Indicadores: ${state.currentTab}`);
             document.getElementById('view-desc').textContent = descriptions[state.currentTab];
         }
 
