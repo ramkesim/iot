@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cúcuta Smart City - Calculadora de Índice (Enfoque Fronterizo)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 40vh;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        body {
+            background-color: #fafaf9;
+            color: #292524;
+        }
+        /* Custom scrollbar for tables */
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #f5f5f4; 
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 4px;
+        }
+    </style>
+    <!-- Chosen Palette: Cúcuta Neutrals + Border Accent (Red/Rose for Border, Stone background, Thematic Accents) -->
+    <!-- Application Structure Plan: Added a dedicated 'Fórmulas y Fuentes' tab to provide the academic and technical backing for the calculations. The 'Frontera' dimension was added and prioritized with the highest weight to reflect the specific geographic context of the assignment. Each indicator row now includes a 'Fuente' badge. -->
+    <!-- Visualization & Content Choices: Goal: Inform & Calculate -> Viz: Explanatory text blocks with LaTeX-like formatting for formulas + Interactive Data Tables. The chart hides dynamically when the Formulas tab is active to maximize reading space. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="font-sans antialiased overflow-x-hidden h-screen flex flex-col md:flex-row w-full">
+
+    <!-- Sidebar / Tabs -->
+    <aside class="w-full md:w-64 lg:w-72 bg-white border-r border-stone-200 flex flex-col shadow-sm z-10 md:h-screen flex-shrink-0">
+        <div class="p-6 border-b border-stone-100">
+            <h1 class="text-xl font-bold text-stone-800 tracking-tight leading-tight">&#x1F3D9;&#xFE0F; Cúcuta Smart City</h1>
+            <p class="text-xs text-stone-500 mt-1 font-medium">Calculadora - Enfoque Fronterizo</p>
+        </div>
+
+        <nav class="flex-grow p-4 overflow-y-auto space-y-2" id="nav-tabs">
+            <h2 class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mb-2 px-2">Panel Principal</h2>
+            <button data-tab="Resumen" class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-stone-800 text-white font-medium transition-colors shadow-md flex items-center justify-between">
+                <span>&#x1F4CA; Resumen Global</span>
+            </button>
+            <button data-tab="Formulas" class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-white text-stone-600 hover:bg-stone-100 hover:text-stone-800 font-medium transition-colors border border-transparent flex items-center justify-between">
+                <span>&#x1F4D6; Fórmulas y Fuentes</span>
+            </button>
+            
+            <h2 class="text-[10px] uppercase font-bold text-stone-400 tracking-wider mt-6 mb-2 px-2">Dimensiones (Tablas)</h2>
+            <button data-tab="Frontera" class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-white text-stone-600 hover:bg-rose-50 hover:text-rose-700 font-bold transition-colors border border-transparent flex items-center justify-between shadow-sm border-rose-100">
+                <span>&#x1F6A7; Frontera (30%)</span>
+            </button>
+            <button data-tab="Economía" class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-white text-stone-600 hover:bg-blue-50 hover:text-blue-700 font-medium transition-colors border border-transparent flex items-center justify-between">
+                <span>&#x1F4B9; Economía</span>
+            </button>
+            <button data-tab="Medio Ambiente" class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-white text-stone-600 hover:bg-emerald-50 hover:text-emerald-700 font-medium transition-colors border border-transparent flex items-center justify-between">
+                <span>&#x1F33F; Medio Ambiente</span>
+            </button>
+            <button data-tab="Gobernanza" class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-white text-stone-600 hover:bg-amber-50 hover:text-amber-700 font-medium transition-colors border border-transparent flex items-center justify-between">
+                <span>&#x1F3DB; Gobernanza</span>
+            </button>
+            <button data-tab="Movilidad" class="tab-btn w-full text-left px-4 py-3 rounded-xl bg-white text-stone-600 hover:bg-purple-50 hover:text-purple-700 font-medium transition-colors border border-transparent flex items-center justify-between">
+                <span>&#x1F697; Movilidad</span>
+            </button>
+        </nav>
+        
+        <div class="p-4 bg-stone-50 border-t border-stone-200 text-xs text-stone-500 text-center">
+            Diseño Adaptativo - Ingeniería TIC
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col h-screen overflow-hidden bg-stone-50/50 w-full relative">
+        
+        <!-- Header -->
+        <header class="bg-white px-8 py-5 border-b border-stone-200 flex justify-between items-center flex-shrink-0 shadow-sm z-0">
+            <div>
+                <h2 class="text-2xl font-bold text-stone-800" id="view-title">Resumen del Índice</h2>
+                <p class="text-sm text-stone-500" id="view-desc">Consolidado general de todas las dimensiones.</p>
+            </div>
+            <div id="dimension-score-badge" class="hidden text-right">
+                <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">Puntaje Dimensión</p>
+                <p class="text-3xl font-black text-stone-800" id="current-dim-score">0.00</p>
+            </div>
+        </header>
+
+        <!-- Content Scroll Area -->
+        <div class="flex-grow overflow-y-auto p-6 lg:p-8" id="main-scroll-area">
+            
+            <!-- Chart Area -->
+            <div id="chart-section" class="bg-white p-6 rounded-2xl shadow-sm border border-stone-200 mb-8 w-full">
+                <h3 class="text-sm font-bold text-stone-700 mb-4 uppercase tracking-wider" id="chart-title">Desempeño Visual</h3>
+                <div class="chart-container">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Table/Content Area (Dynamically Rendered) -->
+            <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden w-full">
+                <div id="table-header" class="px-6 py-4 border-b border-stone-100 bg-stone-50 flex justify-between items-center">
+                    <h3 class="text-md font-bold text-stone-700" id="table-title">Datos</h3>
+                </div>
+                <div class="overflow-x-auto table-container w-full" id="data-container">
+                    <!-- Dynamic content injects here -->
+                </div>
+            </div>
+            
+            <div class="h-12"></div> <!-- Bottom padding -->
+        </div>
+    </main>
+
+    <script>
+        // Data Configuration with Frontera context and Sources
+        const initData = [
+            // FRONTERA (Priority Dimension)
+            { id: 71, dim: 'Frontera', ind: 'Volumen Comercio Binacional (M USD)', tipo: 'pos', ref: 500, val: 320, fuente: 'DIAN / Álvarez' },
+            { id: 72, dim: 'Frontera', ind: 'Flujo Migratorio Formal (Millones)', tipo: 'pos', ref: 3.0, val: 12.7, fuente: 'Migración Col.' },
+            { id: 73, dim: 'Frontera', ind: 'Informalidad Laboral Migrante (%)', tipo: 'neg', ref: 60, val: 78, fuente: 'DNP' },
+            { id: 74, dim: 'Frontera', ind: 'Trazabilidad Biométrica Puentes (0-10)', tipo: 'pos', ref: 10, val: 4, fuente: 'Jesús Álvarez' },
+            { id: 75, dim: 'Frontera', ind: 'Plataformas Aduanas Digitales', tipo: 'pos', ref: 5, val: 3, fuente: 'IBM / MinTIC' },
+            { id: 76, dim: 'Frontera', ind: 'Migrantes con PPT Digital (%)', tipo: 'pos', ref: 100, val: 80, fuente: 'ONU / ACNUR' },
+
+            // ECONOMÍA
+            { id: 1, dim: 'Economía', ind: 'Densidad de Startups / 100k hab', tipo: 'pos', ref: 100, val: 45, fuente: 'CC Cúcuta' },
+            { id: 2, dim: 'Economía', ind: 'Bancarización Comercio Digital (%)', tipo: 'pos', ref: 90, val: 65, fuente: 'IBM' },
+            { id: 3, dim: 'Economía', ind: 'Apertura de Empresas (Días)', tipo: 'neg', ref: 5, val: 12, fuente: 'Banco Mundial' },
+            { id: 4, dim: 'Economía', ind: 'Exportación Servicios TIC (M USD)', tipo: 'pos', ref: 50, val: 15, fuente: 'ProColombia' },
+            
+            // MEDIO AMBIENTE
+            { id: 21, dim: 'Medio Ambiente', ind: 'Calidad Aire PM2.5 (μg/m³) - Sensores', tipo: 'neg', ref: 10, val: 25, fuente: 'ONU / Corponor' },
+            { id: 22, dim: 'Medio Ambiente', ind: 'Calidad Aire PM10 (μg/m³)', tipo: 'neg', ref: 20, val: 40, fuente: 'IQAir' },
+            { id: 23, dim: 'Medio Ambiente', ind: 'Pérdida de Agua en Red Acueducto (%)', tipo: 'neg', ref: 10, val: 35, fuente: 'ITU' },
+            { id: 24, dim: 'Medio Ambiente', ind: 'Densidad Nodos IoT Ciudadanos', tipo: 'pos', ref: 50, val: 15, fuente: 'Jesús Álvarez' },
+            
+            // GOBERNANZA
+            { id: 41, dim: 'Gobernanza', ind: 'Trámites 100% Digitales (%)', tipo: 'pos', ref: 100, val: 30, fuente: 'IBM' },
+            { id: 42, dim: 'Gobernanza', ind: 'Datasets Abiertos (Cant)', tipo: 'pos', ref: 50, val: 18, fuente: 'ONU' },
+            { id: 43, dim: 'Gobernanza', ind: 'Respuesta PQRS (Días)', tipo: 'neg', ref: 3, val: 15, fuente: 'MinTIC' },
+            { id: 44, dim: 'Gobernanza', ind: 'Cámaras IA LPR Seguridad', tipo: 'pos', ref: 300, val: 120, fuente: 'Jesús Álvarez' },
+            
+            // MOVILIDAD
+            { id: 56, dim: 'Movilidad', ind: 'Malla Ciclo-Ruta (Km)', tipo: 'pos', ref: 100, val: 25, fuente: 'TU Wien' },
+            { id: 57, dim: 'Movilidad', ind: 'Flota Transporte con GPS (%)', tipo: 'pos', ref: 100, val: 40, fuente: 'IBM' },
+            { id: 58, dim: 'Movilidad', ind: 'Semáforos Inteligentes Adaptativos (%)', tipo: 'pos', ref: 100, val: 10, fuente: 'Jesús Álvarez' },
+            { id: 59, dim: 'Movilidad', ind: 'Índice de Congestión Vial (Horas Pico)', tipo: 'neg', ref: 20, val: 45, fuente: 'TU Wien' }
+        ];
+
+        // Specific custom weights to emphasize Frontera
+        const dimWeights = {
+            'Frontera': 0.30,       // 30% Priority
+            'Economía': 0.20,       // 20%
+            'Medio Ambiente': 0.20, // 20%
+            'Gobernanza': 0.15,     // 15%
+            'Movilidad': 0.15       // 15%
+        };
+
+        const colors = {
+            'Resumen': { hex: '#292524' },
+            'Fórmulas': { hex: '#57534e' },
+            'Frontera': { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200', hex: '#e11d48' },
+            'Economía': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', hex: '#2563eb' },
+            'Medio Ambiente': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', hex: '#10b981' },
+            'Gobernanza': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200', hex: '#d97706' },
+            'Movilidad': { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200', hex: '#9333ea' }
+        };
+
+        const descriptions = {
+            'Resumen': 'Consolidado general del Índice con peso priorizado en Resiliencia Fronteriza.',
+            'Formulas': 'Diccionario matemático, lógica de normalización y fuentes bibliográficas del modelo.',
+            'Frontera': 'Métricas críticas de comercio binacional, flujo migratorio e integración territorial.',
+            'Economía': 'Competitividad, startups y digitalización del comercio local.',
+            'Medio Ambiente': 'Métricas de sensores IoT y sostenibilidad urbana.',
+            'Gobernanza': 'Eficiencia gubernamental y transparencia de datos abiertos.',
+            'Movilidad': 'Indicadores de tráfico e infraestructura inteligente.'
+        };
+
+        // State Management
+        let state = {
+            currentTab: 'Resumen',
+            data: [...initData]
+        };
+        let chartInstance = null;
+
+        // Core Calculation Function
+        function calculateScore(tipo, val, ref) {
+            let score = 0;
+            if (val === 0 && tipo === 'neg') return 0;
+            if (ref === 0 && tipo === 'pos') return 0;
+
+            if (tipo === 'pos') {
+                score = (val / ref) * 10;
+            } else {
+                score = (ref / val) * 10;
+            }
+            return Math.min(Math.max(score, 0), 10);
+        }
+
+        function getScoreColor(score) {
+            if (score >= 8) return 'text-emerald-600';
+            if (score >= 5) return 'text-amber-500';
+            return 'text-red-500';
+        }
+
+        window.updateValue = function(id, inputVal) {
+            const index = state.data.findIndex(d => d.id === id);
+            if (index !== -1) {
+                const newVal = parseFloat(inputVal) || 0;
+                state.data[index].val = newVal;
+                
+                const score = calculateScore(state.data[index].tipo, newVal, state.data[index].ref);
+                const scoreCell = document.getElementById(`score-${id}`);
+                if (scoreCell) {
+                    scoreCell.textContent = score.toFixed(2);
+                    scoreCell.className = `font-bold ${getScoreColor(score)}`;
+                }
+
+                updateDimensionBadge();
+                renderChart();
+            }
+        };
+
+        function getAverages() {
+            const dims = Object.keys(dimWeights);
+            const avgs = {};
+            
+            dims.forEach(dim => {
+                const items = state.data.filter(d => d.dim === dim);
+                if(items.length === 0) { avgs[dim] = 0; return; }
+                const totalScore = items.reduce((sum, item) => sum + calculateScore(item.tipo, item.val, item.ref), 0);
+                avgs[dim] = totalScore / items.length;
+            });
+            return avgs;
+        }
+
+        function updateDimensionBadge() {
+            const badge = document.getElementById('dimension-score-badge');
+            const scoreText = document.getElementById('current-dim-score');
+            
+            if (state.currentTab === 'Resumen' || state.currentTab === 'Formulas') {
+                badge.classList.add('hidden');
+            } else {
+                badge.classList.remove('hidden');
+                const avgs = getAverages();
+                const avg = avgs[state.currentTab] || 0;
+                scoreText.textContent = avg.toFixed(2);
+                scoreText.className = `text-3xl font-black ${getScoreColor(avg)}`;
+            }
+        }
+
+        function renderChart() {
+            const chartSection = document.getElementById('chart-section');
+            if (state.currentTab === 'Formulas') {
+                chartSection.style.display = 'none'; // Hide chart on Formulas tab
+                return;
+            } else {
+                chartSection.style.display = 'block';
+            }
+
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            let labels = [];
+            let dataPoints = [];
+            let bgColors = [];
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            if (state.currentTab === 'Resumen') {
+                const avgs = getAverages();
+                labels = Object.keys(avgs);
+                dataPoints = Object.values(avgs);
+                bgColors = labels.map(l => colors[l].hex);
+            } else {
+                const items = state.data.filter(d => d.dim === state.currentTab);
+                labels = items.map(i => i.ind.length > 20 ? i.ind.substring(0, 20) + '...' : i.ind);
+                dataPoints = items.map(i => calculateScore(i.tipo, i.val, i.ref));
+                bgColors = colors[state.currentTab].hex;
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Puntaje',
+                        data: dataPoints,
+                        backgroundColor: bgColors,
+                        borderRadius: 4,
+                        maxBarThickness: 60
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, max: 10, grid: { color: '#f5f5f4' } },
+                        x: { grid: { display: false }, ticks: { maxRotation: 45, minRotation: 0 } }
+                    }
+                }
+            });
+        }
+
+        function renderFormulasTab() {
+            const container = document.getElementById('data-container');
+            const tableTitle = document.getElementById('table-title');
+            document.getElementById('table-header').style.display = 'none'; // Hide default header
+
+            container.innerHTML = `
+                <div class="p-8 text-stone-700 bg-white">
+                    <div class="mb-10">
+                        <h2 class="text-3xl font-bold text-stone-800 mb-2 border-b-2 border-stone-100 pb-4">&#x1F4D0; Diccionario Analítico y Metodología</h2>
+                        <p class="mt-4 text-stone-600 text-lg leading-relaxed">
+                            El Índice Smart City Cúcuta utiliza un modelo algorítmico de normalización para convertir datos heterogéneos (monedas, porcentajes, unidades físicas) en una escala estandarizada de <strong>0 a 10</strong>, permitiendo su agregación ponderada.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+                        <!-- Positive Formula -->
+                        <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-6">
+                            <h3 class="font-bold text-emerald-800 text-lg mb-3 flex items-center gap-2">
+                                <span class="bg-emerald-200 text-emerald-900 px-2 py-1 rounded text-xs">Tipo Positivo &#x2191;</span> 
+                                Más es Mejor
+                            </h3>
+                            <p class="text-sm text-emerald-700 mb-4">Se aplica a indicadores de crecimiento, infraestructura y beneficios (ej. Escuelas, Volumen de Exportación).</p>
+                            <div class="bg-white p-4 rounded-lg font-mono text-center text-emerald-900 border border-emerald-200 shadow-inner">
+                                P = (Valor Real / Referencia Óptima) × 10
+                            </div>
+                        </div>
+
+                        <!-- Negative Formula -->
+                        <div class="bg-red-50 border border-red-100 rounded-xl p-6">
+                            <h3 class="font-bold text-red-800 text-lg mb-3 flex items-center gap-2">
+                                <span class="bg-red-200 text-red-900 px-2 py-1 rounded text-xs">Tipo Negativo &#x2193;</span> 
+                                Menos es Mejor
+                            </h3>
+                            <p class="text-sm text-red-700 mb-4">Se aplica a métricas de déficit, contaminación o ineficiencia (ej. Desempleo, Pérdida de agua, Tiempos de espera).</p>
+                            <div class="bg-white p-4 rounded-lg font-mono text-center text-red-900 border border-red-200 shadow-inner">
+                                P = (Referencia Óptima / Valor Real) × 10
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-stone-800 mb-6 border-b border-stone-100 pb-2">&#x1F4DA; Fuentes de Contraste y Modelos Teóricos</h3>
+                    <div class="space-y-6">
+                        <div class="bg-stone-50 p-5 rounded-lg border border-stone-200">
+                            <h4 class="font-bold text-rose-700 text-lg mb-1">Modelo Adaptativo (Jesús Álvarez)</h4>
+                            <p class="text-sm text-stone-600 mb-2"><strong>Contexto:</strong> Capítulo de Libro - Propuesta de Construcción de Ciudades Inteligentes en Colombia.</p>
+                            <p class="text-sm text-stone-600">Sustenta la dimensión de <strong>Frontera</strong> y la implementación de <strong>Nodos IoT (Hardware Abierto)</strong>. Plantea que Cúcuta no puede medirse con estándares europeos sin antes adaptar sus métricas a la resiliencia binacional, el flujo migratorio y el monitoreo participativo.</p>
+                        </div>
+
+                        <div class="bg-stone-50 p-5 rounded-lg border border-stone-200">
+                            <h4 class="font-bold text-blue-700 text-lg mb-1">IBM Smarter Cities</h4>
+                            <p class="text-sm text-stone-600 mb-2"><strong>Contexto:</strong> Framework global corporativo de eficiencia.</p>
+                            <p class="text-sm text-stone-600">Utilizado para contrastar la dimensión de <strong>Gobernanza y Economía</strong>. Provee los estándares óptimos para interoperabilidad de datos, trámites 100% digitales y tiempos de respuesta (PQRS).</p>
+                        </div>
+
+                        <div class="bg-stone-50 p-5 rounded-lg border border-stone-200">
+                            <h4 class="font-bold text-emerald-700 text-lg mb-1">ONU / ITU (Indicadores U4SSC)</h4>
+                            <p class="text-sm text-stone-600 mb-2"><strong>Contexto:</strong> Unión Internacional de Telecomunicaciones - Pilares de Sostenibilidad.</p>
+                            <p class="text-sm text-stone-600">Fundamenta las referencias óptimas de <strong>Medio Ambiente</strong>. Define los límites de calidad de aire (PM2.5 / PM10) y la necesidad de integrar bases de datos abiertas gubernamentales para la equidad ciudadana.</p>
+                        </div>
+
+                        <div class="bg-stone-50 p-5 rounded-lg border border-stone-200">
+                            <h4 class="font-bold text-stone-800 text-lg mb-1">Fuentes de Datos Locales</h4>
+                            <p class="text-sm text-stone-600">Para los cálculos matemáticos de Cúcuta, los valores reales son extraídos y contrastados contra las bases de datos de: <strong>DANE</strong> (Economía), <strong>DIAN / Migración Colombia</strong> (Frontera), <strong>Corponor</strong> (Ambiente), y el <strong>MinTIC</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTable() {
+            if (state.currentTab === 'Formulas') {
+                renderFormulasTab();
+                return;
+            }
+
+            document.getElementById('table-header').style.display = 'flex'; // Ensure header is visible
+            const container = document.getElementById('data-container');
+            const tableTitle = document.getElementById('table-title');
+            
+            if (state.currentTab === 'Resumen') {
+                tableTitle.innerHTML = '&#x1F4CA; Consolidado del Índice (Enfoque Frontera)';
+                
+                const avgs = getAverages();
+                let totalIndex = 0;
+
+                let html = `
+                    <table class="w-full text-left border-collapse min-w-[600px]">
+                        <thead>
+                            <tr class="bg-stone-100 text-stone-500 text-[11px] uppercase tracking-wider font-semibold border-b border-stone-200">
+                                <th class="px-6 py-4">Dimensión</th>
+                                <th class="px-6 py-4 text-center">N° Ind.</th>
+                                <th class="px-6 py-4 text-right">Promedio (0-10)</th>
+                                <th class="px-6 py-4 text-center">Peso Específico</th>
+                                <th class="px-6 py-4 text-right">Puntaje Ponderado</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                `;
+
+                Object.keys(dimWeights).forEach(dim => {
+                    const count = state.data.filter(d => d.dim === dim).length;
+                    const avg = avgs[dim];
+                    const weight = dimWeights[dim];
+                    const weighted = avg * weight;
+                    totalIndex += weighted;
+                    const highlightClass = dim === 'Frontera' ? 'bg-rose-50 border-rose-100' : 'hover:bg-stone-50';
+
+                    html += `
+                        <tr class="border-b border-stone-100 ${highlightClass}">
+                            <td class="px-6 py-4 font-bold text-stone-700">${dim === 'Frontera' ? '&#x1F6A7; ' : ''}${dim}</td>
+                            <td class="px-6 py-4 text-center text-stone-500">${count}</td>
+                            <td class="px-6 py-4 text-right font-mono ${getScoreColor(avg)} font-bold">${avg.toFixed(2)}</td>
+                            <td class="px-6 py-4 text-center text-stone-500 font-bold">${(weight * 100)}%</td>
+                            <td class="px-6 py-4 text-right font-mono font-bold text-stone-700">${weighted.toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                        <tr class="bg-stone-800 text-white font-bold text-lg border-t-4 border-emerald-500">
+                            <td colspan="4" class="px-6 py-5 text-right uppercase tracking-wider text-xs">Índice Smart City Total:</td>
+                            <td class="px-6 py-5 text-right font-mono text-emerald-400 text-2xl">${totalIndex.toFixed(2)}</td>
+                        </tr>
+                        </tbody></table>
+                `;
+                container.innerHTML = html;
+
+            } else {
+                tableTitle.innerHTML = `Ingreso de Datos: ${state.currentTab}`;
+                const items = state.data.filter(d => d.dim === state.currentTab);
+                
+                let html = `
+                    <table class="w-full text-left border-collapse min-w-[900px]">
+                        <thead>
+                            <tr class="bg-stone-100 text-stone-500 text-[10px] uppercase tracking-wider font-semibold border-b border-stone-200">
+                                <th class="px-6 py-4">Indicador de Análisis</th>
+                                <th class="px-4 py-4">Fuente / Contraste</th>
+                                <th class="px-4 py-4 text-center" title="Lógica de cálculo">Tipo</th>
+                                <th class="px-4 py-4 text-right">Ref. Óptima</th>
+                                <th class="px-6 py-4">Valor Real Cúcuta</th>
+                                <th class="px-6 py-4 text-right">Puntaje</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                `;
+
+                items.forEach(item => {
+                    const score = calculateScore(item.tipo, item.val, item.ref);
+                    const arrow = item.tipo === 'pos' 
+                        ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-bold" title="Positivo">Pos &#x2191;</span>' 
+                        : '<span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-bold" title="Negativo">Neg &#x2193;</span>';
+                    
+                    html += `
+                        <tr class="border-b border-stone-100 hover:bg-stone-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-stone-800">${item.ind}</div>
+                            </td>
+                            <td class="px-4 py-4">
+                                <span class="text-xs font-semibold text-stone-500 bg-stone-200 px-2 py-1 rounded border border-stone-300 shadow-sm">${item.fuente}</span>
+                            </td>
+                            <td class="px-4 py-4 text-center">${arrow}</td>
+                            <td class="px-4 py-4 text-right font-mono text-stone-500">${item.ref}</td>
+                            <td class="px-6 py-4">
+                                <input type="number" step="any" value="${item.val}" 
+                                       oninput="updateValue(${item.id}, this.value)"
+                                       class="w-full max-w-[120px] px-3 py-2 border border-stone-300 rounded-lg text-right font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow bg-white text-stone-800 shadow-inner">
+                            </td>
+                            <td class="px-6 py-4 text-right font-mono text-lg">
+                                <span id="score-${item.id}" class="font-bold ${getScoreColor(score)}">${score.toFixed(2)}</span>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+            }
+        }
+
+        // Navigation Logic
+        const navBtns = document.querySelectorAll('.tab-btn');
+        function setNavActive() {
+            navBtns.forEach(btn => {
+                const tabName = btn.getAttribute('data-tab');
+                if (tabName === state.currentTab) {
+                    btn.classList.remove('bg-white', 'text-stone-600', 'border-transparent');
+                    if(tabName === 'Resumen') {
+                        btn.classList.add('bg-stone-800', 'text-white', 'shadow-md');
+                    } else if (tabName === 'Formulas') {
+                        btn.classList.add('bg-stone-200', 'text-stone-800', 'shadow-inner');
+                    } else {
+                        const col = colors[tabName];
+                        btn.classList.add(col.bg, col.text, col.border, 'shadow-sm');
+                    }
+                } else {
+                    btn.classList.remove('bg-stone-800', 'text-white', 'shadow-md', 'bg-stone-200', 'text-stone-800', 'shadow-inner');
+                    ['Frontera', 'Economía', 'Medio Ambiente', 'Gobernanza', 'Movilidad'].forEach(dim => {
+                        const c = colors[dim];
+                        btn.classList.remove(c.bg, c.text, c.border, 'shadow-sm');
+                    });
+                    
+                    // Specific reset for Frontera button styling
+                    if(tabName === 'Frontera') {
+                         btn.classList.add('bg-white', 'text-stone-600', 'border-rose-100');
+                    } else {
+                         btn.classList.add('bg-white', 'text-stone-600', 'border-transparent');
+                    }
+                }
+            });
+
+            document.getElementById('view-title').textContent = state.currentTab === 'Resumen' ? 'Resumen del Índice' : (state.currentTab === 'Formulas' ? 'Metodología Técnica' : `Dimensión: ${state.currentTab}`);
+            document.getElementById('view-desc').textContent = descriptions[state.currentTab];
+        }
+
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                state.currentTab = e.currentTarget.getAttribute('data-tab');
+                setNavActive();
+                updateDimensionBadge();
+                renderTable();
+                renderChart();
+                document.getElementById('main-scroll-area').scrollTop = 0; // Scroll to top on tab change
+            });
+        });
+
+        // Initialize
+        setNavActive();
+        updateDimensionBadge();
+        renderTable();
+        renderChart();
+
+    </script>
+</body>
+</html>
